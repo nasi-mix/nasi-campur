@@ -1,0 +1,61 @@
+package me.qfdk.nasicampur.contoller;
+
+import me.qfdk.nasicampur.service.DockerService;
+import me.qfdk.nasicampur.tools.Outil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class NasiCampurController {
+
+    @Value("${server.port}")
+    private String port;
+
+    @Autowired
+    private DockerService dockerService;
+
+    @GetMapping("/createContainer")
+    public String createContainer(@RequestParam(value = "wechatName") String wechatName){
+        String pass = Outil.getPass(wechatName);
+        String port = Outil.getRandomPort();
+        String containerId = dockerService.createContainer(pass, port);
+        dockerService.startContainer(containerId);
+        return containerId;
+    }
+
+    @GetMapping("/deleteContainer")
+    public int deleteContainer(@RequestParam("id") String containerId) {
+        dockerService.stopContainer(containerId);
+        return dockerService.deleteContainer(containerId);
+    }
+
+    @GetMapping("/startContainer")
+    public String startContainer(@RequestParam("id") String containerId) {
+        dockerService.startContainer(containerId);
+        return dockerService.getInfoContainer(containerId).state().status();
+    }
+
+    @GetMapping("/restartContainer")
+    public String restartContainer(@RequestParam("id") String containerId) {
+        dockerService.restartContainer(containerId);
+        return dockerService.getInfoContainer(containerId).state().status();
+    }
+
+    @GetMapping("/stopContainer")
+    public String stopContainer(@RequestParam("id") String containerId) {
+        dockerService.stopContainer(containerId);
+        return dockerService.getInfoContainer(containerId).state().status();
+    }
+
+    @GetMapping("/info")
+    public String info(@RequestParam("id") String containerId) {
+        return dockerService.getInfoContainer(containerId).state().status();
+    }
+
+
+    @RequestMapping(value = "/hi", method = RequestMethod.GET)
+    public String sayHi(@RequestParam(value = "name", defaultValue = "forezp") String name) {
+        return "Hi," + name + ", from ->" + port;
+    }
+}
