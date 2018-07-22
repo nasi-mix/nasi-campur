@@ -3,15 +3,13 @@ server:
 
 spring:
   application:
-    name: nasi-campur-cn1
+    name: nasi-campur-*
 
 eureka:
   client:
       serviceUrl:
         defaultZone: http://cdn.qfdk.me:8761/eureka/
-  # 指定此实例的ip
-    instance:
+      instance:
         ip-address: cn.qfdk.me
-        # # 注册时使用ip而不是主机名
         prefer-ip-address: true
         instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
