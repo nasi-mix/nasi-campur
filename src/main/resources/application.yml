@@ -9,7 +9,7 @@ eureka:
   client:
       serviceUrl:
         defaultZone: http://cdn.qfdk.me:8761/eureka/
-      instance:
-        ip-address: cn.qfdk.me
-        prefer-ip-address: true
-        instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+  instance:
+    ip-address: cn.qfdk.me
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
