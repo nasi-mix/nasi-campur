@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 public class NasiCampurController {
 
@@ -16,12 +19,18 @@ public class NasiCampurController {
     private DockerService dockerService;
 
     @GetMapping("/createContainer")
-    public String createContainer(@RequestParam(value = "wechatName") String wechatName){
+    public Map<String, String> createContainer(@RequestParam(value = "wechatName") String wechatName) {
         String pass = Outil.getPass(wechatName);
         String port = Outil.getRandomPort();
         String containerId = dockerService.createContainer(pass, port);
         dockerService.startContainer(containerId);
-        return containerId;
+        String status = dockerService.getInfoContainer(containerId).state().status();
+        Map<String, String> map = new HashMap<>();
+        map.put("containerId", containerId);
+        map.put("status", status);
+        map.put("pass", pass);
+        map.put("port", port);
+        return map;
     }
 
     @GetMapping("/deleteContainer")
