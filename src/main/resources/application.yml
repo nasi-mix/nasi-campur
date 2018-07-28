@@ -3,16 +3,16 @@ server:
 
 spring:
   application:
-    name: nasi-campur-*
+    name: nasi-campur-localhost
   cloud:
     client:
-      ipAddress: ip 地址
+      ipAddress: localhost
 
 eureka:
   client:
       serviceUrl:
-        defaultZone: http://cdn.qfdk.me:8761/eureka/
+        defaultZone: http://localhost:8761/eureka/
   instance:
-    ip-address: ip 地址
+    ip-address: localhost
     prefer-ip-address: true
     instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
