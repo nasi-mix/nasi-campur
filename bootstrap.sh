@@ -44,12 +44,19 @@ status(){
   fi
 }
 
+compile(){
+  ./mvnw clean install -DskipTests
+}
+
 restart(){
   stop
   start
 }
 
 case "$1" in
+  "compile")
+    compile
+    ;;
   "start")
     start
     ;;

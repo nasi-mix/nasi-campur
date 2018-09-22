@@ -1,12 +1,16 @@
+nasi:
+  cammpur:
+    appName: localhost
+    ip: localhost
+
 server:
   port: 8762
-
 spring:
   application:
-    name: nasi-campur-localhost
+    name: nasi-campur-${nasi.cammpur.appName}
   cloud:
     client:
-      ipAddress: localhost
+      ipAddress: ${nasi.cammpur.ip}
   security:
     user:
       name: user
@@ -15,12 +19,12 @@ spring:
 eureka:
   client:
       serviceUrl:
-        defaultZone: http://user:pass@localhost:8761/eureka/
+        defaultZone: http://user:password@host:8761/eureka/
   instance:
     metadata-map:
       user.name: ${spring.security.user.name}
       user.password: ${spring.security.user.password}
-    ip-address: localhost
+    ip-address: ${nasi.cammpur.ip}
     prefer-ip-address: true
     instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
 
