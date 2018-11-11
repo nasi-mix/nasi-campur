@@ -1,15 +1,15 @@
-## Nasi campur
+## Nasi campur [![Build Status](https://travis-ci.org/nasi-mix/nasi-campur.svg?branch=master)](https://travis-ci.org/nasi-mix/nasi-campur)
 
 基于docker的 SSR 模块，需要 nasi-eureka 与 nasi-mie 配合使用
 
-## 必需软件
+## Prerequirement
 
 - Java 8
 - Docker
 
-## 快速开始
+## Quickstart
 
 ```java
-mvn clean install
+./mvnw clean install -DskipTests
 ./bootstrap.sh start
 ```

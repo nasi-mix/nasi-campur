@@ -17,6 +17,13 @@ spring:
     client:
       ipAddress: ${nasi.campur.ip}
 
+info:
+  build:
+    artifact: @project.artifactId@
+    name: @project.name@
+    description: @project.description@
+    version: @project.version@
+    
 eureka:
   client:
       serviceUrl:
