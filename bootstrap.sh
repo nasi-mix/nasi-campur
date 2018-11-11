@@ -53,7 +53,16 @@ restart(){
   start
 }
 
+go(){
+    stop
+    compile
+    start
+}
+
 case "$1" in
+  "go")
+    go
+    ;;
   "compile")
     compile
     ;;

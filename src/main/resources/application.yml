@@ -2,23 +2,25 @@ nasi:
   campur:
     appName: localhost
     ip: localhost
+    eurekaUser:
+    eurekaPass:
 server:
   port: 8762
 spring:
+  security:
+    user:
+      name: user
+      password: password
   application:
     name: nasi-campur-${nasi.campur.appName}
   cloud:
     client:
       ipAddress: ${nasi.campur.ip}
-  security:
-    user:
-      name: user
-      password: password
 
 eureka:
   client:
       serviceUrl:
-        defaultZone: http://user:password@host:8761/eureka/
+        defaultZone: http://${nasi.campur.eurekaUser}:${nasi.campur.eurekaPass}@cdn.qfdk.me:8761/eureka,http://${nasi.campur.eurekaUser}:${nasi.campur.eurekaPass}@us.qfdk.me:8761/eureka
   instance:
     metadata-map:
       user.name: ${spring.security.user.name}
