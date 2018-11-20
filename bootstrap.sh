@@ -7,6 +7,9 @@ usage() {
 }
 
 is_exist(){
+  if [ ! -d "logs" ]; then
+    mkdir logs
+  fi
   pid=`ps -ef|grep $APP_NAME|grep -v grep|awk '{print $2}' `
   if [ -z "${pid}" ]; then
    return 1
@@ -20,7 +23,7 @@ start(){
   if [ $? -eq "0" ]; then
     echo "${APP_NAME} 正在运行。 pid=${pid} ."
   else
-    nohup java -server -Xms256m -Xmx512m -jar $APP_NAME > /dev/null 2>&1 &
+    nohup java -server -Dspring.config.location=application.yaml -Xms256m -Xmx512m -jar $APP_NAME > ./logs/`date +%m`_`date +%d`_`date +%y`.log 2>&1 &
     echo "${APP_NAME}启动成功，请查看日志确保运行正常。"
     fi
 }
