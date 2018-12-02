@@ -1,5 +1,7 @@
 package me.qfdk.nasicampur.contoller;
 
+import com.spotify.docker.client.messages.ContainerStats;
+import com.spotify.docker.client.messages.NetworkStats;
 import me.qfdk.nasicampur.service.DockerService;
 import me.qfdk.nasicampur.tools.Outil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,14 @@ public class NasiCampurController {
         return dockerService.getInfoContainer(containerId).state().status();
     }
 
+    @GetMapping("/getNetworkStats")
+    public Map<String, Double> getNetworkStats(@RequestParam("id") String containerId) {
+        Map<String, Double> map = new HashMap<>();
+        NetworkStats traffic=dockerService.getContainerState(containerId).networks().get("eth0");
+        map.put("txBytes",traffic.txBytes() / 1000000.0);
+        map.put("rxBytes",traffic.rxBytes() / 1000000.0);
+        return map;
+    }
 
     @RequestMapping(value = "/hi", method = RequestMethod.GET)
     public String sayHi(@RequestParam(value = "name", defaultValue = "forezp") String name) {

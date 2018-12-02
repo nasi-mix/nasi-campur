@@ -88,6 +88,14 @@ public class DockerService {
         }
     }
 
+    public ContainerStats getContainerState(String containerId){
+        try {
+            return docker.stats(containerId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public ContainerInfo getInfoContainer(String id) {
         try {
             return docker.inspectContainer(id);
