@@ -32,6 +32,7 @@ public class DockerService {
         HostConfig hostConfig = HostConfig.builder()
                 .publishAllPorts(true)
                 .portBindings(portBindings)
+                .restartPolicy(HostConfig.RestartPolicy.always())
                 .build();
         // Create container with exposed ports
         final ContainerConfig containerConfig = ContainerConfig.builder()
