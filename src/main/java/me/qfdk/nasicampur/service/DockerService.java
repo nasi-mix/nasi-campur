@@ -22,7 +22,7 @@ public class DockerService {
         docker = new DefaultDockerClient("unix:///var/run/docker.sock");
     }
 
-    public String createContainer(String passwd, String port) {
+    public String createContainer(String passwd, String port, String wechatName) {
         downloadImage(SSR_IMAGE_NAME);
         final Map<String, List<PortBinding>> portBindings = new HashMap<>();
         List<PortBinding> randomPort = new ArrayList<>();
@@ -43,9 +43,9 @@ public class DockerService {
                 .build();
         ContainerCreation creation = null;
         try {
-            creation = docker.createContainer(containerConfig);
+            creation = docker.createContainer(containerConfig, wechatName);
         } catch (DockerException e) {
-            System.err.println("Docker 服务或没有启动.");
+            System.err.println("Docker 服务没有启动或者升级pom中docker 版本.");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -89,7 +89,7 @@ public class DockerService {
         }
     }
 
-    public ContainerStats getContainerState(String containerId){
+    public ContainerStats getContainerState(String containerId) {
         try {
             return docker.stats(containerId);
         } catch (Exception e) {
