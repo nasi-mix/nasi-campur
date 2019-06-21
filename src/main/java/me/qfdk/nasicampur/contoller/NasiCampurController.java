@@ -69,6 +69,7 @@ public class NasiCampurController {
     @Async
     public Map<String, Double> getNetworkStats(@RequestParam("id") String containerId) {
         Map<String, Double> map = new HashMap<>();
+        System.err.println(dockerService.getContainerState(containerId).networks());
         NetworkStats traffic = dockerService.getContainerState(containerId).networks().get("eth0");
         map.put("txBytes", traffic.txBytes() / 1000000.0);
         map.put("rxBytes", traffic.rxBytes() / 1000000.0);

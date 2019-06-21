@@ -46,6 +46,7 @@ public class DockerService {
             creation = docker.createContainer(containerConfig, wechatName);
         } catch (DockerException e) {
             System.err.println("Docker 服务没有启动或者升级pom中docker 版本.");
+            e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
