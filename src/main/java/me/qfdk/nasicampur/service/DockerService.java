@@ -90,6 +90,15 @@ public class DockerService {
         }
     }
 
+    public int containerCount() {
+        try {
+            return docker.listContainers().size();
+        } catch (DockerException | InterruptedException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public ContainerStats getContainerState(String containerId) {
         try {
             return docker.stats(containerId);

@@ -65,6 +65,12 @@ public class NasiCampurController {
         return dockerService.getInfoContainer(containerId).state().status();
     }
 
+    @GetMapping("/containerCount")
+    public int containerCount() {
+        return dockerService.containerCount();
+    }
+
+
     @GetMapping("/getNetworkStats")
     @Async
     public Map<String, Double> getNetworkStats(@RequestParam("id") String containerId) {
