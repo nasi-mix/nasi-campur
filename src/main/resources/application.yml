@@ -2,8 +2,8 @@ nasi:
   campur:
     appName: localhost
     ip: localhost
-    eurekaUser:
-    eurekaPass:
+    eurekaUser: nasi
+    eurekaPass: eureka
 server:
   port: 8762
 spring:

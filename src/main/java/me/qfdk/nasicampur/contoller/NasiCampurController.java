@@ -1,7 +1,10 @@
 package me.qfdk.nasicampur.contoller;
 
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import com.spotify.docker.client.messages.NetworkStats;
 import me.qfdk.nasicampur.service.DockerService;
+import me.qfdk.nasicampur.service.PontService;
 import me.qfdk.nasicampur.tools.Outil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,11 @@ public class NasiCampurController {
 
     @Autowired
     private DockerService dockerService;
+
+    @Autowired
+    private PontService pontService;
+
+    private Map<Integer, Session> mapSession = new HashMap<>();
 
     @GetMapping("/createContainer")
     public Map<String, String> createContainer(@RequestParam(value = "wechatName") String wechatName, @RequestParam(value = "port", defaultValue = "") String port) {
@@ -82,9 +90,23 @@ public class NasiCampurController {
         return map;
     }
 
-    @RequestMapping(value = "/hi", method = RequestMethod.GET)
-    public String sayHi(@RequestParam(value = "name", defaultValue = "qfdk") String name) {
-        return "Hi," + name;
+    @RequestMapping(value = "/addPont", method = RequestMethod.GET)
+    public String addPort(@RequestParam("sshUser") String sshUser, @RequestParam("sshPassowrd") String sshPassowrd, @RequestParam("host") String host, @RequestParam("port") int port) {
+        Session session = pontService.addPort(sshUser, sshPassowrd, port, host, port);
+        mapSession.put(port, session);
+        return "OK";
+    }
+
+    @RequestMapping(value = "/deletePont", method = RequestMethod.GET)
+    public String deletePort(@RequestParam("port") int port) {
+        try {
+            mapSession.get(port).delPortForwardingL(port);
+            mapSession.remove(port);
+        } catch (JSchException e) {
+            e.printStackTrace();
+            return "KO";
+        }
+        return "OK";
     }
 
 }
