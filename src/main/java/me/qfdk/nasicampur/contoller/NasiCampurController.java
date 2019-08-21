@@ -105,6 +105,7 @@ public class NasiCampurController {
         try {
             mapSession.get(port).delPortForwardingL(Integer.parseInt(port));
             mapSession.remove(port);
+            log.info("[删除端口转发] -> {}", port);
         } catch (JSchException e) {
             e.printStackTrace();
             return "KO";

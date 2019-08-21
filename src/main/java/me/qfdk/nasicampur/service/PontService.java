@@ -30,15 +30,15 @@ public class PontService {
         session.setServerAliveInterval(10000);
         session.connect();
         // 设置SSH本地端口转发,本地转发到远程
-        int assinged_port = session.setPortForwardingL(localPort, remoteHost, remotePort);
+        int assinged_port = session.setPortForwardingL("0.0.0.0", localPort, remoteHost, remotePort);
+        // 设置SSH远程端口转发,远程转发到本地
+//        session.setPortForwardingR(remotePort, remoteHost, localPort);
         session.setDaemonThread(true);
         // 删除本地端口的转发
         // session.delPortForwardingL(localPort);
         // 断开SSH链接
         // session.disconnect();
-        // 设置SSH远程端口转发,远程转发到本地
-        // session.setPortForwardingR(remotePort, remoteHost, localPort);
-        log.info("localhost:" + assinged_port + " -> " + remoteHost + ":" + remotePort);
+        log.info("[添加端口转发] localhost:" + assinged_port + " -> " + remoteHost + ":" + remotePort);
         return session;
     }
 
