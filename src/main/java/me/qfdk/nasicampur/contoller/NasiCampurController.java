@@ -25,7 +25,7 @@ public class NasiCampurController {
     @Autowired
     private PontService pontService;
 
-    private Map<Integer, Session> mapSession = new HashMap<>();
+    private Map<String, Session> mapSession = new HashMap<>();
 
     @GetMapping("/createContainer")
     public Map<String, String> createContainer(@RequestParam(value = "wechatName") String wechatName, @RequestParam(value = "port", defaultValue = "") String port) {
@@ -93,16 +93,16 @@ public class NasiCampurController {
     }
 
     @RequestMapping(value = "/addPont", method = RequestMethod.GET)
-    public String addPort(@RequestParam("sshUser") String sshUser, @RequestParam("sshPassowrd") String sshPassowrd, @RequestParam("host") String host, @RequestParam("port") int port) {
-        Session session = pontService.addPort(sshUser, sshPassowrd, port, host, port);
+    public String addPort(@RequestParam("sshUser") String sshUser, @RequestParam("sshPassowrd") String sshPassowrd, @RequestParam("host") String host, @RequestParam("port") String port) {
+        Session session = pontService.addPort(sshUser, sshPassowrd, Integer.parseInt(port), host, Integer.parseInt(port));
         mapSession.put(port, session);
         return "OK";
     }
 
     @RequestMapping(value = "/deletePont", method = RequestMethod.GET)
-    public String deletePort(@RequestParam("port") int port) {
+    public String deletePort(@RequestParam("port") String port) {
         try {
-            mapSession.get(port).delPortForwardingL(port);
+            mapSession.get(port).delPortForwardingL(Integer.parseInt(port));
             mapSession.remove(port);
         } catch (JSchException e) {
             e.printStackTrace();
