@@ -94,6 +94,7 @@ public class NasiCampurController {
 
     @RequestMapping(value = "/addPont", method = RequestMethod.GET)
     public String addPort(@RequestParam("sshUser") String sshUser, @RequestParam("sshPassowrd") String sshPassowrd, @RequestParam("host") String host, @RequestParam("port") String port) {
+        log.info(sshUser, sshPassowrd, host, port);
         Session session = pontService.addPort(sshUser, sshPassowrd, Integer.parseInt(port), host, Integer.parseInt(port));
         mapSession.put(port, session);
         return "OK";
