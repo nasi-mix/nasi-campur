@@ -3,6 +3,7 @@ package me.qfdk.nasicampur.contoller;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.spotify.docker.client.messages.NetworkStats;
+import lombok.extern.slf4j.Slf4j;
 import me.qfdk.nasicampur.service.DockerService;
 import me.qfdk.nasicampur.service.PontService;
 import me.qfdk.nasicampur.tools.Outil;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@Slf4j
 public class NasiCampurController {
 
     @Autowired
@@ -83,10 +85,10 @@ public class NasiCampurController {
     @Async
     public Map<String, Double> getNetworkStats(@RequestParam("id") String containerId) {
         Map<String, Double> map = new HashMap<>();
-        System.err.println(dockerService.getContainerState(containerId).networks());
         NetworkStats traffic = dockerService.getContainerState(containerId).networks().get("eth0");
         map.put("txBytes", traffic.txBytes() / 1000000.0);
         map.put("rxBytes", traffic.rxBytes() / 1000000.0);
+        log.info(String.valueOf(map));
         return map;
     }
 

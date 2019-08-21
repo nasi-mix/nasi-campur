@@ -4,13 +4,10 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-@EnableAsync
 public class PontService {
 
     public Session addPort(String sshUser, String sshPassword, int localPort, String remoteHost, int remotePort) {
@@ -22,7 +19,6 @@ public class PontService {
         return null;
     }
 
-    @Async
     Session openSSH(String sshUser, String sshPassword, int localPort, String remoteHost, int remotePort) throws JSchException {
         // SSH访问端口
         int sshPort = 22;
@@ -46,6 +42,4 @@ public class PontService {
         return session;
     }
 
-    public void deletePort(int port) {
-    }
 }
