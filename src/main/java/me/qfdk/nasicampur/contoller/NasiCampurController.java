@@ -94,7 +94,6 @@ public class NasiCampurController {
 
     @RequestMapping(value = "/addPont", method = RequestMethod.GET)
     public String addPort(@RequestParam("sshUser") String sshUser, @RequestParam("sshPassword") String sshPassword, @RequestParam("host") String host, @RequestParam("port") String port) {
-        log.info("[添加端口转发] localhost:{} -> {}:{}", port, host, port);
         Session session = pontService.addPort(sshUser, sshPassword, Integer.parseInt(port), host, Integer.parseInt(port));
         mapSession.put(port, session);
         return "OK";
@@ -103,9 +102,12 @@ public class NasiCampurController {
     @RequestMapping(value = "/deletePont", method = RequestMethod.GET)
     public String deletePort(@RequestParam("port") String port) {
         try {
-            mapSession.get(port).delPortForwardingL(Integer.parseInt(port));
-            mapSession.remove(port);
-            log.info("[删除端口转发] -> {}", port);
+            if (mapSession.get(port) != null) {
+                mapSession.get(port).delPortForwardingL(Integer.parseInt(port));
+                mapSession.get(port).disconnect();
+                mapSession.remove(port);
+                log.info("[删除端口转发] -> {}", port);
+            }
         } catch (JSchException e) {
             e.printStackTrace();
             return "KO";
