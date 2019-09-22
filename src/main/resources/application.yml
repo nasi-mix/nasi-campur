@@ -16,17 +16,17 @@ spring:
   cloud:
     client:
       ipAddress: ${nasi.campur.ip}
-    
+
 eureka:
   client:
-      serviceUrl:
-        defaultZone: http://${nasi.campur.eurekaUser}:${nasi.campur.eurekaPass}@cdn.qfdk.me:8761/eureka,http://${nasi.campur.eurekaUser}:${nasi.campur.eurekaPass}@us.qfdk.me:8761/eureka
+    serviceUrl:
+      defaultZone: http://${nasi.campur.eurekaUser}:${nasi.campur.eurekaPass}@cdn.qfdk.me:8761/eureka,http://${nasi.campur.eurekaUser}:${nasi.campur.eurekaPass}@us.qfdk.me:8761/eureka
   instance:
     metadata-map:
       user.name: ${spring.security.user.name}
       user.password: ${spring.security.user.password}
     ip-address: ${nasi.campur.ip}
-    prefer-ip-address: true
+    prefer-ip-address: false
     instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
 
 management:
