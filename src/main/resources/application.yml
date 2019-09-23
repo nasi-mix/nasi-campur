@@ -15,7 +15,7 @@ spring:
     name: nasi-campur-${nasi.campur.appName}
   cloud:
     client:
-      ipAddress: ${nasi.campur.ip}
+      ip-address: ${nasi.campur.ip}
 
 eureka:
   client:
@@ -27,7 +27,7 @@ eureka:
       user.password: ${spring.security.user.password}
     ip-address: ${nasi.campur.ip}
     prefer-ip-address: false
-    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}
 
 management:
   endpoints:
