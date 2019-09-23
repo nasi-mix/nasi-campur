@@ -4,15 +4,14 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.spotify.docker.client.messages.NetworkStats;
 import lombok.extern.slf4j.Slf4j;
+import me.qfdk.nasicampur.NasiCampurApplication;
 import me.qfdk.nasicampur.service.DockerService;
 import me.qfdk.nasicampur.service.PontService;
 import me.qfdk.nasicampur.tools.Outil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +21,10 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Slf4j
@@ -147,14 +150,24 @@ public class NasiCampurController {
         } catch (FileNotFoundException e) {
             log.error("application.yaml 未找到");
         }
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<?> request = new HttpEntity<>(null, httpHeaders);
-        try {
-            restTemplate.postForEntity("http://localhost:8762/actuator/refresh", request, String.class);
-        } catch (Exception e) {
-            log.info("正在完成重新注册...");
-        }
+
+        ExecutorService threadPool = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.DiscardOldestPolicy());
+        threadPool.execute(() -> {
+            NasiCampurApplication.context.close();
+            log.info("准备重启服务器完成新IP地址注册...{}", ip);
+            NasiCampurApplication.context = SpringApplication.run(NasiCampurApplication.class, "");
+            log.info("完成重新注册...{}", ip);
+        });
+        threadPool.shutdown();
+
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+//        HttpEntity<?> request = new HttpEntity<>(null, httpHeaders);
+//        try {
+//            restTemplate.postForEntity("http://localhost:8762/actuator/refresh", request, String.class);
+//        } catch (Exception e) {
+//            log.info("正在完成重新注册...");
+//        }
     }
 
 }
