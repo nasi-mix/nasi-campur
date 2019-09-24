@@ -44,6 +44,10 @@ public class NasiCampurController {
 
     @GetMapping("/createContainer")
     public Map<String, String> createContainer(@RequestParam(value = "wechatName") String wechatName, @RequestParam(value = "port", defaultValue = "") String port) {
+        return createContainerMap(wechatName, port);
+    }
+
+    private Map<String, String> createContainerMap(@RequestParam("wechatName") String wechatName, @RequestParam(value = "port", defaultValue = "") String port) {
         String pass = Outil.getPass(wechatName);
 
         if (StringUtils.isEmpty(port)) {
@@ -83,6 +87,13 @@ public class NasiCampurController {
     public String stopContainer(@RequestParam("id") String containerId) {
         dockerService.stopContainer(containerId);
         return dockerService.getInfoContainer(containerId).state().status();
+    }
+
+    @GetMapping("/reCreateContainer")
+    public Map<String, String> reCreateContainer(@RequestParam(value = "wechatName") String wechatName, @RequestParam(value = "port", defaultValue = "") String port) {
+        dockerService.stopContainer(wechatName);
+        dockerService.deleteContainer(wechatName);
+        return createContainerMap(wechatName, port);
     }
 
     @GetMapping("/info")
