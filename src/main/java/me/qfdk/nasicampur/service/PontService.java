@@ -23,7 +23,7 @@ public class PontService {
             session = jsch.getSession(sshUser, remoteHost, sshPort);
             session.setPassword(sshPassword);
             // 设置第一次登陆的时候提示，可选值：(ask | yes | no)
-            session.setConfig("StrictHostKeyChecking", "yes");
+            session.setConfig("StrictHostKeyChecking", "no");
             session.setServerAliveInterval(10000);
             session.connect();
             // 设置SSH本地端口转发,本地转发到远程
