@@ -48,12 +48,12 @@ public class NasiCampurController {
     String prxoyLocation;
 
     @GetMapping("/runProxy")
-    public void init() {
+    public void runProxy(@RequestParam(value = "pass") String pass) {
         User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + prxoyLocation, User[].class);
         if (users != null && users.length > 0)
             for (User user : users) {
                 log.info("[{}]: 中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
-                Session session = pontService.addPort("proxy", "proxy", user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
+                Session session = pontService.addPort("root", pass, user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
                 mapSession.put(user.getContainerPort(), session);
             }
     }
