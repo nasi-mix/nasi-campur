@@ -5,11 +5,13 @@ import com.jcraft.jsch.Session;
 import com.spotify.docker.client.messages.NetworkStats;
 import lombok.extern.slf4j.Slf4j;
 import me.qfdk.nasicampur.NasiCampurApplication;
+import me.qfdk.nasicampur.entity.User;
 import me.qfdk.nasicampur.service.DockerService;
 import me.qfdk.nasicampur.service.PontService;
 import me.qfdk.nasicampur.tools.Outil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Async;
@@ -18,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +44,20 @@ public class NasiCampurController {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Value("${spring.application.name}")
+    String containerLocation;
+
+    @PostConstruct
+    public void init() {
+        User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + containerLocation, User[].class);
+        if (users != null && users.length > 0)
+            for (User user : users) {
+                log.info("[{}]: 中转服务器{} => {}.", user.getWechatName()user.getPontLocation(), user.getContainerLocation());
+                Session session = pontService.addPort("proxy", "proxy", user.getPontLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
+                mapSession.put(user.getContainerPort(), session);
+            }
+    }
 
     @GetMapping("/createContainer")
     public Map<String, String> createContainer(@RequestParam(value = "wechatName") String wechatName, @RequestParam(value = "port", defaultValue = "") String port) {
@@ -170,15 +187,6 @@ public class NasiCampurController {
             log.info("完成重新注册...{}", ip);
         });
         threadPool.shutdown();
-
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
-//        HttpEntity<?> request = new HttpEntity<>(null, httpHeaders);
-//        try {
-//            restTemplate.postForEntity("http://localhost:8762/actuator/refresh", request, String.class);
-//        } catch (Exception e) {
-//            log.info("正在完成重新注册...");
-//        }
     }
 
 }
