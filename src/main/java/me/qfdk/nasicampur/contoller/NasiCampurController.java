@@ -45,15 +45,15 @@ public class NasiCampurController {
     RestTemplate restTemplate;
 
     @Value("${spring.application.name}")
-    String containerLocation;
+    String prxoyLocation;
 
     @GetMapping("/runProxy")
     public void init() {
-        User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + containerLocation, User[].class);
+        User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + prxoyLocation, User[].class);
         if (users != null && users.length > 0)
             for (User user : users) {
                 log.info("[{}]: 中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
-                Session session = pontService.addPort("proxy", "proxy", user.getPontLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
+                Session session = pontService.addPort("proxy", "proxy", user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
                 mapSession.put(user.getContainerPort(), session);
             }
     }
