@@ -19,6 +19,7 @@ public class NasiCampurApplication {
     RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
     public static void main(String[] args) {
         context = SpringApplication.run(NasiCampurApplication.class, args);
     }

@@ -20,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class NasiCampurController {
     @Value("${spring.application.name}")
     String containerLocation;
 
-    @PostConstruct
+    @GetMapping("/runProxy")
     public void init() {
         User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + containerLocation, User[].class);
         if (users != null && users.length > 0)
