@@ -57,7 +57,7 @@ public class NasiCampurController {
     @GetMapping("/runProxy")
     public void runProxy(@RequestParam(value = "pass") String pass) {
         log.info("[{}]: 中转服务器.", "开始");
-        User[] users = restTemplate.getForObject("http://fr.qfdk.me:8899/getProxyList?location=" + prxoyLocation, User[].class);
+        User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + prxoyLocation, User[].class);
         if (users != null && users.length > 0)
             for (User user : users) {
                 log.info("[{}]: 中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
