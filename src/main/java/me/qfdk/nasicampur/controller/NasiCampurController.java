@@ -1,4 +1,4 @@
-package me.qfdk.nasicampur.contoller;
+package me.qfdk.nasicampur.controller;
 
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -34,22 +37,27 @@ import java.util.concurrent.TimeUnit;
 public class NasiCampurController {
 
     @Autowired
-    private DockerService dockerService;
-
-    @Autowired
-    private PontService pontService;
-
-    private Map<String, Session> mapSession = new HashMap<>();
-
-    @Autowired
     RestTemplate restTemplate;
-
     @Value("${spring.application.name}")
     String prxoyLocation;
+    @Autowired
+    private DockerService dockerService;
+    @Autowired
+    private PontService pontService;
+    private Map<String, Session> mapSession = new HashMap<>();
+    @Autowired
+    private DiscoveryClient client;
+
+    @GetMapping("/test")
+    public void test() {
+        List<ServiceInstance> serviceInstances = client.getInstances("nasi-mie");
+        System.out.println(serviceInstances.get(0).getHost()+":"+String.valueOf(serviceInstances.get(0).getPort()));
+    }
 
     @GetMapping("/runProxy")
     public void runProxy(@RequestParam(value = "pass") String pass) {
-        User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + prxoyLocation, User[].class);
+        log.info("[{}]: 中转服务器.", "开始");
+        User[] users = restTemplate.getForObject("http://fr.qfdk.me:8899/getProxyList?location=" + prxoyLocation, User[].class);
         if (users != null && users.length > 0)
             for (User user : users) {
                 log.info("[{}]: 中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
