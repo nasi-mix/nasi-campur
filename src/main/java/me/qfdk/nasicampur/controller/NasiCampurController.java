@@ -48,10 +48,10 @@ public class NasiCampurController {
     private Map<String, Session> mapSession = new HashMap<>();
 
 
-    @PostConstruct
-    public void init() {
-        runProxy();
-    }
+//    @PostConstruct
+//    public void init() {
+//        runProxy();
+//    }
 
     @GetMapping("/runProxy")
     @ResponseBody
