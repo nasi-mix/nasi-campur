@@ -13,8 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +20,9 @@ import org.springframework.web.client.RestTemplate;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -38,32 +36,41 @@ public class NasiCampurController {
 
     @Autowired
     RestTemplate restTemplate;
+
     @Value("${spring.application.name}")
     String prxoyLocation;
+
     @Autowired
     private DockerService dockerService;
+
     @Autowired
     private PontService pontService;
     private Map<String, Session> mapSession = new HashMap<>();
-    @Autowired
-    private DiscoveryClient client;
 
-    @GetMapping("/test")
-    public void test() {
-        List<ServiceInstance> serviceInstances = client.getInstances("nasi-mie");
-        System.out.println(serviceInstances.get(0).getHost()+":"+String.valueOf(serviceInstances.get(0).getPort()));
+
+    @PostConstruct
+    public void init() {
+        runProxy();
     }
 
     @GetMapping("/runProxy")
-    public void runProxy(@RequestParam(value = "pass") String pass) {
-        log.info("[{}]: 中转服务器.", "开始");
+    @ResponseBody
+    public String runProxy() {
+        log.info("[{}]: 添加中转服务器.", "Proxy");
+        String pass = restTemplate.getForObject("http://nasi-mie/getSSHPassword", String.class);
         User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + prxoyLocation, User[].class);
-        if (users != null && users.length > 0)
+        if (users != null && users.length > 0) {
             for (User user : users) {
-                log.info("[{}]: 中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
+                log.info("[{}]: 启动中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
                 Session session = pontService.addPort("root", pass, user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
                 mapSession.put(user.getContainerPort(), session);
             }
+            log.info("[{}]: 添加中转服务器完成.", "Proxy");
+            return "添加中转服务器 success. " + users.length;
+        } else {
+            log.warn("[{}]: 无需添加中转服务器.", "Proxy");
+            return "无需添加中转服务器.";
+        }
     }
 
     @GetMapping("/createContainer")

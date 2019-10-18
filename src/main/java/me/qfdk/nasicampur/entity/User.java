@@ -178,4 +178,12 @@ public class User {
     public void setContainerLocation(String containerLocation) {
         this.containerLocation = containerLocation;
     }
+
+    public String getPontLocation() {
+        return pontLocation;
+    }
+
+    public void setPontLocation(String pontLocation) {
+        this.pontLocation = pontLocation;
+    }
 }
