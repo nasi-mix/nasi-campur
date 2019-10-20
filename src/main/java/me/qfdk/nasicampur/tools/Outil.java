@@ -33,11 +33,10 @@ public class Outil {
         try {
             ServerSocket server = new ServerSocket(port);
             server.close();
-            System.out.println("The port is available.");
+            log.info("[Port] {} 可以使用 => 准备建立 proxy", port);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("The port is occupied.");
+            log.error(e.getMessage());
         }
         return false;
     }
