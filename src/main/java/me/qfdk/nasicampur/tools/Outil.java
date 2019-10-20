@@ -1,8 +1,14 @@
 package me.qfdk.nasicampur.tools;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+@Slf4j
 public class Outil {
 
     public static String getRandomPort() {
@@ -24,5 +30,17 @@ public class Outil {
 
     public static String getPass(String str) {
         return new StringBuffer(str).reverse().toString();
+    }
+
+    public static boolean isPortUsing(String host, int port) throws UnknownHostException {
+        boolean flag = false;
+        InetAddress Address = InetAddress.getByName(host);
+        try {
+            Socket socket = new Socket(Address, port);
+            flag = true;
+        } catch (IOException e) {
+            log.info("[PORT] 端口 {} 没有占用", port);
+        }
+        return flag;
     }
 }
