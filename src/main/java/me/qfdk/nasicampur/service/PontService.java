@@ -34,7 +34,7 @@ public class PontService {
             session.setDaemonThread(true);
             // on le sette explicitement au cas où
             session.setServerAliveCountMax(60);
-            session.connect(60000);
+            session.connect();
             // 设置SSH本地端口转发,本地转发到远程
             int assinged_port = session.setPortForwardingL("*", localPort, remoteHost, remotePort);
             // 设置SSH远程端口转发,远程转发到本地
