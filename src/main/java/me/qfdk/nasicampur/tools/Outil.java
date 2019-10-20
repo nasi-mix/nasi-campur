@@ -3,10 +3,7 @@ package me.qfdk.nasicampur.tools;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
 
 @Slf4j
 public class Outil {
@@ -32,15 +29,15 @@ public class Outil {
         return new StringBuffer(str).reverse().toString();
     }
 
-    public static boolean isPortUsing(String host, int port) throws UnknownHostException {
-        boolean flag = false;
-        InetAddress Address = InetAddress.getByName(host);
+    public static boolean isPortAvailable(int port) {
         try {
-            Socket socket = new Socket(Address, port);
-            flag = true;
+            ServerSocket server = new ServerSocket(port);
+            System.out.println("The port is available.");
+            return true;
         } catch (IOException e) {
-            log.info("[PORT] 端口 {} 没有占用", port);
+            e.printStackTrace();
+            System.out.println("The port is occupied.");
         }
-        return flag;
+        return false;
     }
 }

@@ -22,7 +22,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -62,15 +61,11 @@ public class NasiCampurController {
         User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + prxoyLocation, User[].class);
         if (users != null && users.length > 0) {
             for (User user : users) {
-                try {
-                    // 测试是否占用，没有占用启动
-                    if (!Outil.isPortUsing("*", Integer.parseInt(user.getContainerPort()))) {
-                        log.info("[{}]: 启动中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
-                        Session session = pontService.addPort("root", pass, user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
-                        mapSession.put(user.getContainerPort(), session);
-                    }
-                } catch (UnknownHostException e) {
-                    log.error("UnknownHostException");
+                // 测试是否占用，没有占用启动
+                if (Outil.isPortAvailable(Integer.parseInt(user.getContainerPort()))) {
+                    log.info("[{}]: 启动中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
+                    Session session = pontService.addPort("root", pass, user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
+                    mapSession.put(user.getContainerPort(), session);
                 }
             }
             log.info("[{}]: 添加中转服务器完成.", "Proxy");
