@@ -30,7 +30,7 @@ public class PontService {
             session.setPassword(sshPassword);
             // 设置第一次登陆的时候提示，可选值：(ask | yes | no)
             session.setConfig("StrictHostKeyChecking", "no");
-            session.setServerAliveInterval(30);
+            session.setServerAliveInterval(30000);
             session.setDaemonThread(true);
             // on le sette explicitement au cas où
             session.setServerAliveCountMax(60);
