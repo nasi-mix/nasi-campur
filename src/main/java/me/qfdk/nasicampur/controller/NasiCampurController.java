@@ -56,19 +56,19 @@ public class NasiCampurController {
     @GetMapping("/runProxy")
     @ResponseBody
     public String runProxy() {
-        log.info("[{}]: 添加中转服务器.", "Proxy");
         String pass = restTemplate.getForObject("http://nasi-mie/getSSHPassword", String.class);
         User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + prxoyLocation, User[].class);
         if (users != null && users.length > 0) {
             for (User user : users) {
                 // 测试是否占用，没有占用启动
                 if (Outil.isPortAvailable(Integer.parseInt(user.getContainerPort()))) {
+                    log.info("[{}]: 添加中转服务器.", "Proxy");
                     log.info("[{}]: 启动中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
                     Session session = pontService.addPort("root", pass, user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
                     mapSession.put(user.getContainerPort(), session);
+                    log.info("[{}]: 添加中转服务器完成.", "Proxy");
                 }
             }
-            log.info("[{}]: 添加中转服务器完成.", "Proxy");
             return "添加中转服务器 success.";
         } else {
             log.warn("[{}]: 无需添加中转服务器.", "Proxy");

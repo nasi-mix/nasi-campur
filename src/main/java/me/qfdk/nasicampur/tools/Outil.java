@@ -32,6 +32,7 @@ public class Outil {
     public static boolean isPortAvailable(int port) {
         try {
             ServerSocket server = new ServerSocket(port);
+            server.close();
             System.out.println("The port is available.");
             return true;
         } catch (IOException e) {
