@@ -64,7 +64,7 @@ public class NasiCampurController {
             for (User user : users) {
                 try {
                     // 测试是否占用，没有占用启动
-                    if (!Outil.isPortUsing("127.0.0.1", Integer.parseInt(user.getContainerPort()))) {
+                    if (!Outil.isPortUsing("*", Integer.parseInt(user.getContainerPort()))) {
                         log.info("[{}]: 启动中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
                         Session session = pontService.addPort("root", pass, user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
                         mapSession.put(user.getContainerPort(), session);
