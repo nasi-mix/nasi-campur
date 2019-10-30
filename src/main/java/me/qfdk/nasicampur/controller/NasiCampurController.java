@@ -22,12 +22,10 @@ import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @RestController
 @Slf4j
@@ -53,25 +51,37 @@ public class NasiCampurController {
         runProxy();
     }
 
+    @GetMapping("/")
+    @ResponseBody
+    public String index() {
+        return new Date().toString();
+    }
+
     @GetMapping("/runProxy")
     @ResponseBody
     public String runProxy() {
-        String pass = restTemplate.getForObject("http://nasi-mie/getSSHPassword", String.class);
-        User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + prxoyLocation, User[].class);
-        if (users != null && users.length > 0) {
-            for (User user : users) {
-                // 测试是否占用，没有占用启动
-                if (Outil.isPortAvailable(Integer.parseInt(user.getContainerPort()))) {
-                    log.info("[{}]: 添加中转服务器.", "Proxy");
-                    log.info("[{}]: 启动中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
-                    Session session = pontService.addPort("root", pass, user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
-                    mapSession.put(user.getContainerPort(), session);
-                    log.info("[{}]: 添加中转服务器完成.", "Proxy");
+        try {
+            String pass = restTemplate.getForObject("http://nasi-mie/getSSHPassword", String.class);
+            User[] users = restTemplate.getForObject("http://nasi-mie/getProxyList?location=" + prxoyLocation, User[].class);
+            if (users != null && users.length > 0) {
+                for (User user : users) {
+                    // 测试是否占用，没有占用启动
+                    if (Outil.isPortAvailable(Integer.parseInt(user.getContainerPort()))) {
+                        log.info("[{}]: 添加中转服务器.", "Proxy");
+                        log.info("[{}]: 启动中转服务器{} => {}.", user.getWechatName(), user.getPontLocation(), user.getContainerLocation());
+                        Session session = pontService.addPort("root", pass, user.getContainerLocation() + ".qfdk.me", Integer.parseInt(user.getContainerPort()));
+                        mapSession.put(user.getContainerPort(), session);
+                        log.info("[{}]: 添加中转服务器完成.", "Proxy");
+                    }
                 }
+                return "添加中转服务器 success.";
+            } else {
+                log.warn("[{}]: 无需添加中转服务器.", "Proxy");
+                return "无需添加中转服务器.";
             }
-            return "添加中转服务器 success.";
-        } else {
-            log.warn("[{}]: 无需添加中转服务器.", "Proxy");
+        } catch (Exception e) {
+
+            log.warn("[{}]: 服务出错 => {}", "Proxy", e.getMessage());
             return "无需添加中转服务器.";
         }
     }
@@ -143,13 +153,13 @@ public class NasiCampurController {
 
     @GetMapping("/getNetworkStats")
     @Async
-    public Map<String, Double> getNetworkStats(@RequestParam("id") String containerId) {
+    public CompletableFuture<Map<String, Double>> getNetworkStats(@RequestParam("id") String containerId) {
         Map<String, Double> map = new HashMap<>();
         NetworkStats traffic = dockerService.getContainerState(containerId).networks().get("eth0");
         map.put("txBytes", traffic.txBytes() / 1000000.0);
         map.put("rxBytes", traffic.rxBytes() / 1000000.0);
         log.info(String.valueOf(map));
-        return map;
+        return CompletableFuture.completedFuture(map);
     }
 
     @RequestMapping(value = "/addPont", method = RequestMethod.GET)
@@ -188,7 +198,7 @@ public class NasiCampurController {
         } catch (FileNotFoundException e) {
             log.error("application.yaml 未找到");
         }
-        System.out.println("Old ip => " + ((Map) ((Map) map.get("nasi")).get("campur")).get("ip"));
+        log.info("[ip服务] 准备更换ip {} => {}" + ((Map) ((Map) map.get("nasi")).get("campur")).get("ip"), ip);
         ((Map) ((Map) map.get("nasi")).get("campur")).put("ip", ip);
         try {
             yaml.dump(map, new OutputStreamWriter(new FileOutputStream(new File(System.getProperty("user.dir") + "/application.yaml"))));
@@ -199,9 +209,9 @@ public class NasiCampurController {
         ExecutorService threadPool = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.DiscardOldestPolicy());
         threadPool.execute(() -> {
             NasiCampurApplication.context.close();
-            log.info("准备重启服务器完成新IP地址注册...{}", ip);
+            log.info("[ip服务] 准备重启服务器完成新IP {} 注册 ...", ip);
             NasiCampurApplication.context = SpringApplication.run(NasiCampurApplication.class, "");
-            log.info("完成重新注册...{}", ip);
+            log.info("[ip服务] 完成重新注册 {}", ip);
         });
         threadPool.shutdown();
     }
