@@ -198,7 +198,7 @@ public class NasiCampurController {
         } catch (FileNotFoundException e) {
             log.error("application.yaml 未找到");
         }
-        log.info("[ip服务] 准备更换ip {} => {}" + ((Map) ((Map) map.get("nasi")).get("campur")).get("ip"), ip);
+        log.info("[ip服务] 准备更换ip {} => {}", ((Map) ((Map) map.get("nasi")).get("campur")).get("ip"), ip);
         ((Map) ((Map) map.get("nasi")).get("campur")).put("ip", ip);
         try {
             yaml.dump(map, new OutputStreamWriter(new FileOutputStream(new File(System.getProperty("user.dir") + "/application.yaml"))));

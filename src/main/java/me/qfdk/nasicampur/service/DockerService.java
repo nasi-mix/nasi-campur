@@ -1,9 +1,9 @@
 package me.qfdk.nasicampur.service;
 
-import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.*;
+import me.qfdk.nasicampur.tools.DockerUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class DockerService {
     private final static String SSR_IMAGE_NAME = "breakwa11/shadowsocksr:latest";
 
     public DockerService() {
-        docker = new DefaultDockerClient("unix:///var/run/docker.sock");
+        docker = DockerUtil.getInstance();
     }
 
     public String createContainer(String passwd, String port, String wechatName) {
