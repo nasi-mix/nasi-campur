@@ -4,7 +4,6 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.spotify.docker.client.messages.NetworkStats;
 import lombok.extern.slf4j.Slf4j;
-import me.qfdk.nasicampur.NasiCampurApplication;
 import me.qfdk.nasicampur.entity.User;
 import me.qfdk.nasicampur.service.DockerService;
 import me.qfdk.nasicampur.service.PontService;
@@ -12,8 +11,8 @@ import me.qfdk.nasicampur.tools.Outil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.cloud.context.refresh.ContextRefresher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -43,8 +42,11 @@ public class NasiCampurController {
 
     @Autowired
     private PontService pontService;
+
     private Map<String, Session> mapSession = new HashMap<>();
 
+    @Autowired
+    private ContextRefresher contextRefresher;
 
     @PostConstruct
     public void init() {
@@ -208,9 +210,8 @@ public class NasiCampurController {
 
         ExecutorService threadPool = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.DiscardOldestPolicy());
         threadPool.execute(() -> {
-            NasiCampurApplication.context.close();
             log.info("[ip服务] 准备重启服务器完成新IP {} 注册 ...", ip);
-            NasiCampurApplication.context = SpringApplication.run(NasiCampurApplication.class, "");
+            log.info("刷新内容 {}", contextRefresher.refresh());
             log.info("[ip服务] 完成重新注册 {}", ip);
         });
         threadPool.shutdown();
